@@ -13,13 +13,31 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Nome)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Telefone)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Endereco)
+                @Html.DisplayNameFor(model => model.Endereco.Rua)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Endereco.Numero)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Endereco.Cidade)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Endereco.Estado)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Endereco.CEP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Usuario.Email)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Usuario)
@@ -31,10 +49,25 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Nome)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Telefone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Endereco.Rua)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Endereco.Numero)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Endereco.Cidade)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Endereco.Estado)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Endereco.CEP)

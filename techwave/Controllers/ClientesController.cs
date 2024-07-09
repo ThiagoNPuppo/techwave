@@ -62,10 +62,23 @@ namespace techwave.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Telefone,EnderecoId,UsuarioId")] Cliente cliente)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Telefone,Endereco,Usuario")] Cliente cliente)
         {
             if (ModelState.IsValid)
             {
+                //adicionado o endereço
+                _context.Endereco.Add(cliente.Endereco);
+                await _context.SaveChangesAsync();
+
+                // Adicionado o usuário ao contexto e salve as mudanças
+                _context.Usuario.Add(cliente.Usuario);
+                await _context.SaveChangesAsync();
+
+                // Associe os IDs do endereço e usuário ao cliente
+                cliente.EnderecoId = cliente.Endereco.Id;
+                cliente.UsuarioId = cliente.Usuario.Id;
+
+
                 _context.Add(cliente);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
