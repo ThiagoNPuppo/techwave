@@ -74,21 +74,21 @@ namespace techwave.Controllers
                 _context.Usuario.Add(cliente.Usuario);
                 await _context.SaveChangesAsync();
 
-                // Associe os IDs do endereço e usuário ao cliente
+                // Associado os IDs do endereço e usuário ao cliente
                 cliente.EnderecoId = cliente.Endereco.Id;
                 cliente.UsuarioId = cliente.Usuario.Id;
 
-
-                _context.Add(cliente);
+                // Adicione o cliente ao contexto e salve as mudanças
+                _context.Cliente.Add(cliente);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EnderecoId"] = new SelectList(_context.Endereco, "Id", "CEP", cliente.EnderecoId);
-            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "Id", "Email", cliente.UsuarioId);
+            
             return View(cliente);
         }
 
         // GET: Clientes/Edit/5
+        //Incluir relacionamentos endereço e usuario
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Cliente == null)
@@ -96,22 +96,22 @@ namespace techwave.Controllers
                 return NotFound();
             }
 
-            var cliente = await _context.Cliente.FindAsync(id);
+            var cliente = await _context.Cliente.Include(c => c.Endereco).Include(c => c.Usuario).FirstOrDefaultAsync(m => m.Id == id);  
             if (cliente == null)
             {
                 return NotFound();
             }
+
             ViewData["EnderecoId"] = new SelectList(_context.Endereco, "Id", "CEP", cliente.EnderecoId);
-            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "Id", "Email", cliente.UsuarioId);
+            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "Id", "Email", cliente.Usuario.Id);
             return View(cliente);
         }
 
         // POST: Clientes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Atualizar e salvar no bd
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Telefone,EnderecoId,UsuarioId")] Cliente cliente)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Telefone,Endereco,Usuario")] Cliente cliente)
         {
             if (id != cliente.Id)
             {
@@ -121,10 +121,20 @@ namespace techwave.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {
+                {                
+                    // Atualiza o endereço
+                    _context.Update(cliente.Endereco);
+                    await _context.SaveChangesAsync();
+
+                    // Atualiza o usuário
+                    _context.Update(cliente.Usuario);
+                    await _context.SaveChangesAsync();
+
+                    // Atualiza o cliente
                     _context.Update(cliente);
                     await _context.SaveChangesAsync();
                 }
+                
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!ClienteExists(cliente.Id))

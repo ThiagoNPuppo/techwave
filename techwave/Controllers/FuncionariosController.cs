@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using NuGet.ProjectModel;
 using ProjetoFinal.Models;
 using techwave.Data;
 
@@ -22,8 +24,12 @@ namespace techwave.Controllers
         // GET: Funcionarios
         public async Task<IActionResult> Index()
         {
-            var techwaveContext = _context.Funcionario.Include(f => f.Endereco);
-            return View(await techwaveContext.ToListAsync());
+            var funcionarios = await _context.Funcionario
+                .Include(f => f.Endereco)
+                .Include(f => f.Usuario)
+                .ToListAsync();
+
+            return View(funcionarios);
         }
 
         // GET: Funcionarios/Details/5
@@ -36,6 +42,7 @@ namespace techwave.Controllers
 
             var funcionario = await _context.Funcionario
                 .Include(f => f.Endereco)
+                .Include(f => f.Usuario)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (funcionario == null)
             {
@@ -49,6 +56,7 @@ namespace techwave.Controllers
         public IActionResult Create()
         {
             ViewData["EnderecoId"] = new SelectList(_context.Endereco, "Id", "CEP");
+            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "Id", "Email");
             return View();
         }
 
@@ -57,17 +65,31 @@ namespace techwave.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Email,Telefone,EnderecoId,UsuarioId")] Funcionario funcionario)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Email,Telefone,Endereco,Usuario")] Funcionario funcionario)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(funcionario);
+                //adicionado o endereço
+                _context.Endereco.Add(funcionario.Endereco);
+                await _context.SaveChangesAsync();
+
+                // Adicionado o usuário ao contexto e salve as mudanças
+                _context.Usuario.Add(funcionario.Usuario);
+                await _context.SaveChangesAsync();
+
+                // Associado os IDs do endereço e usuário ao cliente
+                funcionario.EnderecoId = funcionario.Endereco.Id;
+                funcionario.UsuarioId = funcionario.Usuario.Id;
+
+                // Adicione o cliente ao contexto e salve as mudanças
+                _context.Funcionario.Add(funcionario);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EnderecoId"] = new SelectList(_context.Endereco, "Id", "CEP", funcionario.EnderecoId);
             return View(funcionario);
         }
+       
+
 
         // GET: Funcionarios/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -77,12 +99,13 @@ namespace techwave.Controllers
                 return NotFound();
             }
 
-            var funcionario = await _context.Funcionario.FindAsync(id);
+            var funcionario = await _context.Cliente.Include(c => c.Endereco).Include(c => c.Usuario).FirstOrDefaultAsync(m => m.Id == id);
             if (funcionario == null)
             {
                 return NotFound();
             }
             ViewData["EnderecoId"] = new SelectList(_context.Endereco, "Id", "CEP", funcionario.EnderecoId);
+            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "Id", "Email", funcionario.Usuario.Id); 
             return View(funcionario);
         }
 
@@ -91,7 +114,7 @@ namespace techwave.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Email,Telefone,EnderecoId,UsuarioId")] Funcionario funcionario)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Email,Telefone,Endereco,Usuario")] Funcionario funcionario)
         {
             if (id != funcionario.Id)
             {
@@ -102,6 +125,15 @@ namespace techwave.Controllers
             {
                 try
                 {
+                    // Atualiza o endereço
+                    _context.Update(funcionario.Endereco);
+                    await _context.SaveChangesAsync();
+
+                    // Atualiza o usuário
+                    _context.Update(funcionario.Usuario);
+                    await _context.SaveChangesAsync();
+
+                    // Atualiza o cliente
                     _context.Update(funcionario);
                     await _context.SaveChangesAsync();
                 }
@@ -119,6 +151,7 @@ namespace techwave.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["EnderecoId"] = new SelectList(_context.Endereco, "Id", "CEP", funcionario.EnderecoId);
+            ViewData["UsuarioId"] = new SelectList(_context.Usuario, "Id", "Email", funcionario.UsuarioId); 
             return View(funcionario);
         }
 
@@ -130,9 +163,11 @@ namespace techwave.Controllers
                 return NotFound();
             }
 
-            var funcionario = await _context.Funcionario
-                .Include(f => f.Endereco)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var funcionario = await _context.Cliente
+               .Include(c => c.Endereco)
+               .Include(c => c.Usuario)
+               .FirstOrDefaultAsync(m => m.Id == id);
+
             if (funcionario == null)
             {
                 return NotFound();

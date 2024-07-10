@@ -14,8 +14,10 @@ namespace ProjetoFinal.Models
         public string Descricao { get; set; }
 
         [Required]
-        [Range(0.01, 10000.00)]
+        [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)]
+        [RegularExpression(@"^\d+(\,\d{1,2})?$", ErrorMessage = "Preço deve ser um valor decimal com até duas casas decimais.")]
         public decimal Preco { get; set; }
+
 
         public int Estoque { get; set; }
     }

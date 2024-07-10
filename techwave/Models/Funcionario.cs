@@ -20,6 +20,7 @@ namespace ProjetoFinal.Models
         public Endereco Endereco { get; set; }
 
         public int UsuarioId { get; set; }
+        public Usuario Usuario { get; set; }
 
     }
 }
