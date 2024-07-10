@@ -18,7 +18,8 @@ namespace ProjetoFinal.Models
         [RegularExpression(@"^\d+(\,\d{1,2})?$", ErrorMessage = "Preço deve ser um valor decimal com até duas casas decimais.")]
         public decimal Preco { get; set; }
 
-
         public int Estoque { get; set; }
+                
+        public string ImagemUrl { get; set; }
     }
 }
