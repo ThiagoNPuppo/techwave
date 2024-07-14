@@ -55,4 +55,10 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+
+//logs
+var builderr = WebApplication.CreateBuilder(args);
+builderr.Logging.ClearProviders();
+builderr.Logging.AddConsole();
+
 app.Run();

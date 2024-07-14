@@ -1,7 +1,8 @@
-﻿// Produto.cs
+﻿
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ProjetoFinal.Models
+namespace techwave.Models
 {
     public class Produto
     {
@@ -14,12 +15,14 @@ namespace ProjetoFinal.Models
         public string Descricao { get; set; }
 
         [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        [DataType(DataType.Currency)]
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = true)]
-        [RegularExpression(@"^\d+(\,\d{1,2})?$", ErrorMessage = "Preço deve ser um valor decimal com até duas casas decimais.")]
         public decimal Preco { get; set; }
 
         public int Estoque { get; set; }
-                
+
+        //public IFormFile Imagem { get; set; }
         public string ImagemUrl { get; set; }
     }
 }

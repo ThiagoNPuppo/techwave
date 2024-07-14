@@ -1,4 +1,4 @@
-﻿using ProjetoFinal.Models;
+﻿using techwave.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

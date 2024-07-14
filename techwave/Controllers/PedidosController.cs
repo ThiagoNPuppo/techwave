@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using ProjetoFinal.Models;
+//using techwave.Models;
 using techwave.Data;
 using techwave.Models;
 

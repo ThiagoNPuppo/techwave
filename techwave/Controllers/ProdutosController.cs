@@ -2,47 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using ProjetoFinal.Models;
 using techwave.Data;
+using techwave.Models;
+using System.IO;
+//using ProjetoFinal.Models;
 
 namespace techwave.Controllers
 {
     public class ProdutosController : Controller
     {
         private readonly techwaveContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProdutosController(techwaveContext context)
+        public ProdutosController(techwaveContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Produtos
         public async Task<IActionResult> Index()
         {
-              return _context.Produto != null ? 
-                          View(await _context.Produto.ToListAsync()) :
-                          Problem("Entity set 'techwaveContext.Produto'  is null.");
-        }
-
-        // GET: Produtos/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Produto == null)
-            {
-                return NotFound();
-            }
-
-            var produto = await _context.Produto
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (produto == null)
-            {
-                return NotFound();
-            }
-
-            return View(produto);
+            return View(await _context.Produto.ToListAsync());
         }
 
         // GET: Produtos/Create
@@ -52,14 +37,25 @@ namespace techwave.Controllers
         }
 
         // POST: Produtos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Preco,Estoque")] Produto produto)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Preco,Estoque,ImagemUrl")] Produto produto, IFormFile imagem)
         {
+            Produto x;
             if (ModelState.IsValid)
             {
+                if (imagem != null)
+                {
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + imagem.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imagem.CopyToAsync(fileStream);
+                    }
+                    produto.ImagemUrl = "/images/" + uniqueFileName;
+                }
+
                 _context.Add(produto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -70,7 +66,7 @@ namespace techwave.Controllers
         // GET: Produtos/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Produto == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -84,11 +80,9 @@ namespace techwave.Controllers
         }
 
         // POST: Produtos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,Preco,Estoque, imagemURL")] Produto produto)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,Preco,Estoque,ImagemUrl")] Produto produto)
         {
             if (id != produto.Id)
             {
@@ -121,7 +115,7 @@ namespace techwave.Controllers
         // GET: Produtos/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Produto == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -141,23 +135,15 @@ namespace techwave.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Produto == null)
-            {
-                return Problem("Entity set 'techwaveContext.Produto'  is null.");
-            }
             var produto = await _context.Produto.FindAsync(id);
-            if (produto != null)
-            {
-                _context.Produto.Remove(produto);
-            }
-            
+            _context.Produto.Remove(produto);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProdutoExists(int id)
         {
-          return (_context.Produto?.Any(e => e.Id == id)).GetValueOrDefault();
+            return _context.Produto.Any(e => e.Id == id);
         }
     }
 }

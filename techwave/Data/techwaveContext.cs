@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ProjetoFinal.Models;
 using techwave.Models;
+
 
 namespace techwave.Data
 {
@@ -26,5 +26,14 @@ namespace techwave.Data
         public DbSet<Cliente>? Cliente { get; set; }
         public DbSet<Pedido> Pedido { get; set; }
         public DbSet<PedidoProduto> PedidoProduto { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Produto>(entity =>
+            {
+                entity.Property(e => e.Preco).HasColumnType("decimal(18,2)");
+            });
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

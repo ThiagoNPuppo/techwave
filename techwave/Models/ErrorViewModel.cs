@@ -1,4 +1,4 @@
-namespace ProjetoFinal.Models
+namespace techwave.Models
 {
     public class ErrorViewModel
     {

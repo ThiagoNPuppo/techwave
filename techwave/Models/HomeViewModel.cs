@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-namespace ProjetoFinal.Models
+namespace techwave.Models
 
 {
     public class HomeViewModel

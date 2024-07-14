@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ProjetoFinal.Models
+namespace techwave.Models
 {
     [Table("Usuarios")]
     public class Usuario

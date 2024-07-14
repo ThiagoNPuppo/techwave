@@ -1,22 +1,29 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using techwave.Data;
 
 
 namespace techwave.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly techwaveContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(techwaveContext context)
         {
-            _logger = logger;
+            _context = context;
+        }
+        
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.Produto.ToListAsync());
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        //public IActionResult Index()
+        //{
+        //    return View();
+        //}
 
         public IActionResult Privacy()
         {
@@ -26,7 +33,7 @@ namespace techwave.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ProjetoFinal.Models.ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new techwave.Models.ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ProjetoFinal.Models
+namespace techwave.Models
 {
     public class Funcionario
     {
@@ -14,6 +14,7 @@ namespace ProjetoFinal.Models
         public string Email { get; set; }
     
         [Required]
+        [Phone]
         public string Telefone { get; set; }
        
         public int EnderecoId { get; set; }
