@@ -39,19 +39,19 @@ namespace techwave.Controllers
         // POST: Produtos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Preco,Estoque,ImagemUrl")] Produto produto, IFormFile imagem)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Preco,Estoque,Imagem")] Produto produto, IFormFile imagem)
         {
             Produto x;
             if (ModelState.IsValid)
             {
-                if (imagem != null)
+                if (produto.Imagem != null)
                 {
                     string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + imagem.FileName;
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + produto.Imagem.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
-                        await imagem.CopyToAsync(fileStream);
+                        await produto.Imagem.CopyToAsync(fileStream);
                     }
                     produto.ImagemUrl = "/images/" + uniqueFileName;
                 }

@@ -22,7 +22,8 @@ namespace techwave.Models
 
         public int Estoque { get; set; }
 
-        //public IFormFile Imagem { get; set; }
+        [NotMapped]
+        public IFormFile Imagem { get; set; }
         public string ImagemUrl { get; set; }
     }
 }
