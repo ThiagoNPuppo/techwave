@@ -17,7 +17,10 @@ namespace techwave.Controllers
         
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Produto.ToListAsync());
+            var produtos = await _context.Produto.ToListAsync();
+            return View(produtos);
+
+            //return View(await _context.Produto.ToListAsync());
         }
 
         //public IActionResult Index()
